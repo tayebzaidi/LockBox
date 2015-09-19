@@ -5,6 +5,6 @@ http.createServer(function (request, response) {
 		'Content-Type': 'text/plain'
 	})
 	response.write('Message Received!')
-	response.end()
+	response.end();
 }).listen(8080);
 
