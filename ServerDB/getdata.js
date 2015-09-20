@@ -49,63 +49,80 @@ function retrieveData(chunk, req, res) {
 	});
 }
 
-
-
-
-
-
-function updateAverages(var college, var date, var bedtime, var waketime) {
+//College is string, date is datestring, bedtime is timestring, waketime is timestring
+function updateAverages(college, date, bedtime, waketime) {
 	var selectQuery = "SELECT `average_sleep`, `average_bedtime`, `average_waketime`, `count` FROM `dayaverages` WHERE `college` = '" + college + "' AND `date_before_bed` = '" + date + "' LIMIT 1";
 	conn.query(selectQuery, function(error, rows, fields) {
 		var sleptTime = getTimeSlept(bedtime, waketime);
 		if(rows.length == 0) {
-			var insertQuery = "INSERT INTO `dayaverages` (`college`, `date_before_bed`, `average_sleep`, `average_bedtime`, `average_waketime`, `count`) VALUES ('" + college + "', '" + date + "','" + sleptTime + "','" + bedtime + "','" + waketime + "');"
+			var insertQuery = "INSERT INTO `dayaverages` (`college`, `date_before_bed`, `average_sleep`, `average_bedtime`, `average_waketime`, `count`) VALUES ('" + college + "', '" + date + "','" + dateTimeToTimeString(sleptTime) + "','" + bedtime + "','" + waketime + "');"
 			conn.query(insertQuery, function(error, rows, fields) {
-				
+				if(error) {
+					console.log("Error adding new day averages");
+					console.log(error);
+				}
 			});
 		} else {
-			var averageSleep = rows[0]['average_sleep'];
+			var averageSleep = minutesFromString(rows[0]['average_sleep']);
 			var averageBedtime = rows[0]['average_bedtime'];
 			var averageWaketime = rows[0]['average_waketime'];
 			var count = rows[0]['count'];
 			
+			var newAverageSleep = (averageSleep * count + dateTimeToMinutes(sleptTime)) / (count + 1);
+			var newAverageBedtime = "08:30:00";
+			var newAverageWaketime = "07:30:00";
 			
+			var updateQuery = "UPDATE `dayaverages` SET `average_bedtime` = '" + newAverageSleep + "', `average_bedtime` = '" + newAverageBedtime + "', `average_waketime` = '" + newAverageWaketime + "' WHERE `college` = '" + college + "' AND `date_before_bed` = '" + date + "' LIMIT 1";
+			conn.query(updateQuery, function(error, rows, fields) {
+				if(error)
+				{
+					console.log("Error updating dayaverages");
+					console.log(error);
+				}
+			});
 		}
-	});
-	
-	
-	
-	
+	});	
 }
 
-function timeStringToMinutes(var timeString) {
+function dateTimeToTimeString(dateTime) {
+	return "" + dateTime.getHours() + ":" + dateTime.getMinutes() + ":" + dateTime.getSeconds();
+}
+
+function dateTimeToMinutes(dateTime) {
+	return dateTime.getHours() * 60 + dateTime.getMinutes();
+}
+
+function timeStringToMinutes(timeString) {
 	var tokens = timeString.split(':');
 	return parseInt(tokens[0]) * 60 +  parseInt(tokens[1]);
 }
 
-function hourFromString(var timeString) {
+function hourFromTimeString(timeString) {
 	var tokens = timeString.split(':');
 	return parseInt(tokens[0]);
 }
 
-function minutesFromString(var timeString) {
+function minutesFromTimeString(timeString) {
 	var tokens = timeString.split(':');
 	return parseInt(tokens[1]);
 }
 
-//Return a Date option with the time equal to time slept, date set to jan 1 1900 or something
+function createTimeString(hours, minutes, seconds) {
+	return "" + hours + ":" + minutes + ":" + seconds;
+}
+
 //Just get the hours and minutes for SQL query
-function getTimeSlept(var bedtime, var waketime) {
-	var bedMinutes = bedtime.getMinutes() + bedtime.getHours() * 60;
-	if(bedtime.getHours() < 13)
-		bedHours += 1440;
+function getTimeSlept(bedtime, waketime) {
+	var bedMinutes = timeStringToMinutes(bedtime);
+	if(hourFromTimeString(bedtime) < 13)
+		bedMinutes += 1440;
 		
-	var wakeMinutes = waketime.getMintues() + waketime.getHours() * 60 + 1440;
+	var wakeMinutes = timeStringToMinutes(waketime) + 1440;
 
 	var sleptHoursDecimal = (wakeMinutes - bedMinutes) / 60;
 	var sleptHours = Math.floor(sleptHoursDecimal);
 	var sleptMinutes = (sleptHoursDecimal - sleptHours) * 60;
-	return new Date(1900, 00, 01, sleptHours, sleptMinutes, 0, 0);
+	return createTimeString(sleptHours, sleptMinutes, 0);
 }
 
 //---- Utility Functions -----
