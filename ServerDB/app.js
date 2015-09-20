@@ -1,88 +1,68 @@
-console.log("Hello!");
-var http = require('http');
-var server = http.createServer(requestHandler);
-var mysql = require('mysql');
-var conn = connectToDatabase();
-var fs = require('fs');
+console.log("Deploying node server...");
 
+//Load dependencies
+var http = require('http');
+var mysql = require('mysql');
+var fs = require('fs');
 try {
-	var queryString = require('querystring');
+	var queryString = require('querystring'); //Linux
 } catch(exception) {
-	var queryString = require('queryString');
+	var queryString = require('queryString'); //Windows
 }
+
+//Connect to server
+var conn = connectToDatabase();
 conn.connect(function(error) {
 	if(error) { console.log("Unable to connect to database"); }
 	else      { console.log("Connected to database"); }
 })
-server.listen(8080);
+
+//Begin event loop
+var server = http.createServer(requestHandler);
+server.listen(1337);
+console.log("Node server deployed.");
 
 //Main Request Handler
 function requestHandler(req, res) {
 	console.log("Someone connected");
 	if(req.method == "GET") {
-		serveFile(req, res);
+		res.end("GET not support, sry");
 		return;
 	} else if(req.method == "POST") {
-		switch(req.url) {
-			case('/raw'):
-				req.on('data', function(chunk) { retrieveData(chunk, req, res); });
-				break;
-			case('/averages'):
-				req.on('data', function(chunk) { retrieveDataAverages(chunk, req, res); });
-				break;
-			case('/insert'):
-				req.on('data', function(chunk) { insertData(chunk, req, res); });
-				break;
-			default:
-				console.log("Client error connecting")
-				res.end("Error");
-				break;
-		}
+		req.on('data', function(chunk) { handleRequest(chunk, req, res); });
 	} else {
 		console.log('Request method not found');
 		res.end('Error: Request method not found');
 	}
 }
 
-function serveFile(req, res) {
-	if(req.url.indexOf('.html') != -1) {
-		serveHTML(req, res);
-	} else if(req.url.indexOf('.js') != -1) {
-		fs.readFile('/js/main.js', function (err, data) {
-		if(err) console.log(err);
-		res.writeHead(200, {'Content-Type': 'text/javascript'});
-    	res.write(data);
-    	res.end();
-		});
-	} else if(req.url.indexOf('.css') != -1) {
-		fs.readFile('/css/style.css', function (err, data) {
-        if (err) console.log(err);
-        res.writeHead(200, {'Content-Type': 'text/css'});
-        res.write(data);
-        res.end();
-      });
-	} else {
-		console.log('Error: Request not found for client');
-		res.end('Error: Request not found');
-	};
-}
-
-function serveHTML(req, res) {
-	fs.readFile('index.html', function (err, data) {
-    	if (err) {
-     		res.writeHead(500);
-      		return res.end('Error loading index.html');
-    	}
-
-    	res.writeHead(200);
-    	res.end(data);
-  	});
-}
-
-
-function insertData(chunk, req, res) {
-	console.log(req.method);
+function handleRequest(chunk, req, res) {
 	var data = JSON.parse(chunk);
+	if(data.function == undefined) {
+		res.end(JSON.stringify({'success' : false, 'error' : "no function given"}));
+		return;
+	}
+	switch(data.function) {
+		case('insert'):
+			insertData(data, req, res);
+			break;
+		case('raw'):
+			retrieveData(data, req, res);
+			break;
+		case('averages'):
+			retrieveDataAverages(data, req, res);
+			break;
+		case('averageSleep'):
+			retrieveAverageHours(data, req, res);
+			break;
+		default:
+			res.end(JSON.stringify({'success': false, 'error' : "invalid function"}));
+			break;
+	}
+}
+
+
+function insertData(data, req, res) {
 	if(isRequiredSet(data, requiredForRetrieve)) {
 		replyMissingInputs(res);
 		return;
@@ -98,6 +78,7 @@ function insertData(chunk, req, res) {
 		} else {
 			console.log(data.college);
 			res.end(JSON.stringify(rows));
+			updateAverages(data.college, data.date, data.bedtime, data.waketime);
 		}
 	});
 }
@@ -108,8 +89,7 @@ function insertData(chunk, req, res) {
 var requiredForRetrieve = ['college','startDate','endDate'];
 
 //Retrieve all data points in range for one school
-function retrieveData(chunk, req, res) {
-	var data = JSON.parse(chunk.toString());
+function retrieveData(data, req, res) {
 	if(isRequiredSet(data, requiredForRetrieve)) {
 		replyMissingInputs(res);
 		return;
@@ -132,8 +112,7 @@ function retrieveData(chunk, req, res) {
 //Required values to retrieve data in range
 var requiredForRetrieveAverages = ['college','startDate','endDate'];
 //Retrieve all data points in range for one school
-function retrieveDataAverages(chunk, req, res) {
-	var data = JSON.parse(chunk.toString());
+function retrieveDataAverages(data, req, res) {
 	if(isRequiredSet(data, requiredForRetrieve)) {
 		replyMissingInputs(res);
 		return;
@@ -153,18 +132,47 @@ function retrieveDataAverages(chunk, req, res) {
 	});
 }
 
+var requiredForAverageHours = ['college', 'startDate','endDate'];
+function retrieveAverageHours(data, req, res) {
+	if(!isRequiredSet(data, requiredForAverageHours)) {
+		replyMissingInputs(res);
+		return;
+	}
+	
+	var query = "SELECT `date_before_bed`, `average_sleep` FROM `dayaverages` WHERE `college` = '" + data.college + "' AND `date_before_bed` >= '" + data.startDate + "' AND `date_before_bed` <= '" + data.endDate + "';";
+	conn.query(query, function(error, rows, fields) {
+		if(error) {
+			console.log("SELECT Error: " + error);
+			replyErrorRetrievingData(res);
+			return;
+		}
+		res.end(JSON.stringify({'success':true, 'rows':rows}));
+	});
+}
+
 
 //College is string, date is datestring, bedtime is timestring, waketime is timestring
-function updateAverages(college, date, bedtime, waketime) {
+function updateAverages(college, date, bedtime, waketime, callback) {
+	if(typeof(date) !== "string") {
+		date = dateTimeToDateString(date);
+	}
 	var selectQuery = "SELECT `average_sleep`, `average_bedtime`, `average_waketime`, `count` FROM `dayaverages` WHERE `college` = '" + college + "' AND `date_before_bed` = '" + date + "' LIMIT 1";
 	conn.query(selectQuery, function(error, rows, fields) {
+		if(error) {
+			console.log("Select in update error: " + error);
+			return;
+		}
 		var sleptTime = getTimeSlept(bedtime, waketime);
+		console.log(rows.length);
 		if(rows.length == 0) {
-			var insertQuery = "INSERT INTO `dayaverages` (`college`, `date_before_bed`, `average_sleep`, `average_bedtime`, `average_waketime`, `count`) VALUES ('" + college + "', '" + date + "','" + dateTimeToTimeString(sleptTime) + "','" + bedtime + "','" + waketime + "');"
+			var insertQuery = "INSERT INTO `dayaverages` (`college`, `date_before_bed`, `average_sleep`, `average_bedtime`, `average_waketime`, `count`) VALUES ('" + college + "', '" + date + "','" + sleptTime + "','" + bedtime + "','" + waketime + "','" + 1 + "');"
 			conn.query(insertQuery, function(error, rows, fields) {
 				if(error) {
 					console.log("Error adding new day averages");
 					console.log(error);
+				}
+				if(callback) {
+					callback();
 				}
 			});
 		} else {
@@ -173,7 +181,7 @@ function updateAverages(college, date, bedtime, waketime) {
 			var averageWaketime = rows[0]['average_waketime'];
 			var count = rows[0]['count'];
 			
-			var newAverageSleep = (averageSleep * count + dateTimeToMinutes(sleptTime)) / (count + 1);
+			var newAverageSleep = (averageSleep * count + timeStringToMinutes(sleptTime)) / (count + 1);
 			var newAverageBedtime = "08:30:00";
 			var newAverageWaketime = "07:30:00";
 			
@@ -184,12 +192,41 @@ function updateAverages(college, date, bedtime, waketime) {
 					console.log("Error updating dayaverages");
 					console.log(error);
 				}
+				if(callback) {
+					callback();
+				}
 			});
 		}
 	});	
 }
 
+function recalculateAverages() {
+	var query = "SELECT * FROM `sleepdata` WHERE -1";
+	conn.query(query, function(error, rows, fields) {
+		if(error) {
+			console.log(error);
+			return;
+		}
+		
+		recalculateAveragesCallback(rows, 0);
+	});
+}
 
+function recalculateAveragesCallback(rows, i) {
+	console.log(rows.length);
+	if(i >= rows.length) {
+		return;
+	}
+	var college = rows[i]['college'];
+	var dateBeforeBed = dateTimeToDateString(rows[i]['date_before_bed']);
+	var bedtime = rows[i]['bedtime'];
+	var waketime = rows[i]['waketime'];
+	updateAverages(college, dateBeforeBed, bedtime, waketime, function() { recalculateAveragesCallback(rows, i+1) });
+}
+
+function dateTimeToDateString(dateTime) {
+	return "" + dateTime.getFullYear() + "-" + (dateTime.getMonth() + 1) + "-" + dateTime.getDate();
+}
 function dateTimeToTimeString(dateTime) {
 	return "" + dateTime.getHours() + ":" + dateTime.getMinutes() + ":" + dateTime.getSeconds();
 }

@@ -31,7 +31,6 @@ function requestHandler(req, res) {
 }
 
 function serveHTML(req, res) {
-	console.log(req.type);
 	fs.readFile('index.html', function (err, data) {
     	if (err) {
      		res.writeHead(500);
