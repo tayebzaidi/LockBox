@@ -1,0 +1,42 @@
+body{
+	font-family: sans-serif;
+	font-size: 100%;
+	width: 500px;
+	height: 250px;
+	text-align: center;
+	background-color: #002570;
+	color: white;
+	margin-left: 10%;
+}
+
+.row{
+	margin: auto;
+	text-align: center;
+}
+
+.collegeEntry{
+	margin-left: auto;
+	margin-right: auto;
+	position: fixed;
+	width: 80%;
+	height: 90%;
+	text-align: center;
+	left: -500px;
+}
+
+.sleepEntry{
+	left: 500px;
+	position: fixed;
+	width: 80%;
+	height: 70%;
+	margin: auto;
+	margin-left: 10%;
+}
+
+.thanks{
+	width: 80%;
+	height: 90%;
+	margin: auto;
+	position: fixed;
+	top: 250px;
+}
