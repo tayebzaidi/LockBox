@@ -23,6 +23,8 @@ var server = http.createServer(requestHandler);
 server.listen(1337);
 console.log("Node server deployed.");
 
+//recalculateAverages();
+
 //Main Request Handler
 function requestHandler(req, res) {
 	console.log("Requiest recieved.");
