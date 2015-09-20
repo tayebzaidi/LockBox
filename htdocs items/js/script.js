@@ -5,8 +5,8 @@ function getDatesAndAverageHoursArrays(callback) {
 		url: "/lockbox/node",
 		data: JSON.stringify({'function': 'averageSleep',
 			'college': "Macalester College",
-			'startDate': "2014-01-01",
-			'endDate': "2014-01-07"
+			'startDate': "2015-08-01",
+			'endDate' : "2015-09-31"
 		}),
 		dataType: "json",
 		success: function(data) { getDatesAndAverageHoursArraysSuccess(data, callback); }
@@ -48,6 +48,9 @@ function generateChartCallback(dates, hours) {
 				type: 'category',
 				categories: dates
 			}
+		},
+		legend: {
+			show: false
 		}
 	});
 }

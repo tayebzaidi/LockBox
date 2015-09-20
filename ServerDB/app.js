@@ -23,9 +23,11 @@ var server = http.createServer(requestHandler);
 server.listen(1337);
 console.log("Node server deployed.");
 
+//recalculateAverages();
+
 //Main Request Handler
 function requestHandler(req, res) {
-	console.log("Requiest recieved.");
+	console.log("Request recieved.");
 	if(req.method == "GET") {
 		res.end("No GET functions used.");
 		return;
@@ -311,48 +313,3 @@ function replyMissingInputs(res) {
 function replyErrorRetrievingData(res) {
 	res.end('{"success":false, "error":"error retrieving data from database"}');
 }
-
-/*
-	
-	if(req.method === "POST") {
-		console.log("Post");
-		console.log(req);
-		
-		
-		req.on('data', function (chunk) {
-			
-			//console.log("Body: " + body);
-			var data = JSON.parse(chunk.toString());
-			console.log(data);
-			//if(data.college) {
-			
-			//var query = "INSERT INTO sleepdata (date_before_bed, bedtime, waketime, college)"
-			//			+ "VALUES ('" + data.dateBeforeBed + "''" + data.bedtime + "''" + data.waketime + "''" + data.college "')"
-			//} else {
-			//	console.log('Invalid JSON')
-			//}
-		});
-		
-		req.on('end', function() {
-			res.writeHead(200, {
-				'Content-Type': 'text/html'
-			});
-			res.end('post received');
-		});
-		
-		res.end('post received');
-	} else {
-		console.log("Not Post");
-	}
-	res.end();
-}).listen(8080);
-
-/*
-var fs = require('fs');
-fs.writeFile("./test","Hey there!", function(err) {
-	if(err) {
-		return console.log(err);
-	}
-	console.log("The file was saved!")
-})
-*/

@@ -7,7 +7,7 @@ conn.connect(function(error) {
 	else { console.log("Connected to database"); }
 });
 
-var filePath = "sleepdata.csv";
+var filePath = "sleepeasy.csv";
 fs.readFile(filePath, function (err, data) {
 	var bufferString = data.toString();
 	var bufferStringSplit = bufferString.split('\n');
