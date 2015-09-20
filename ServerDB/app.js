@@ -19,26 +19,52 @@ server.listen(8080);
 //Main Request Handler
 function requestHandler(req, res) {
 	console.log("Someone connected");
-	if(req.method != "POST") {
-		serveHTML(req, res);
-		res.end("Error: Invalid request method");
+	if(req.method == "GET") {
+		serveFile(req, res);
 		return;
+	} else if(req.method == "POST") {
+		switch(req.url) {
+			case('/raw'):
+				req.on('data', function(chunk) { retrieveData(chunk, req, res); });
+				break;
+			case('/averages'):
+				req.on('data', function(chunk) { retrieveDataAverages(chunk, req, res); });
+				break;
+			case('/insert'):
+				req.on('data', function(chunk) { insertData(chunk, req, res); });
+				break;
+			default:
+				console.log("Client error connecting")
+				res.end("Error");
+				break;
+		}
+	} else {
+		console.log('Request method not found');
+		res.end('Error: Request method not found');
 	}
-	switch(req.url) {
-		case('/raw'):
-			req.on('data', function(chunk) { retrieveData(chunk, req, res); });
-			break;
-		case('/averages'):
-			req.on('data', function(chunk) { retrieveDataAverages(chunk, req, res); });
-			break;
-		case('/insert'):
-			req.on('data', function(chunk) { insertData(chunk, req, res); });
-			break;
-		default:
-			console.log("Client error connecting")
-			res.end("Error");
-			break;
-	}
+}
+
+function serveFile(req, res) {
+	if(req.url.indexOf('.html') != -1) {
+		serveHTML(req, res);
+	} else if(req.url.indexOf('.js') != -1) {
+		fs.readFile('/js/main.js', function (err, data) {
+		if(err) console.log(err);
+		res.writeHead(200, {'Content-Type': 'text/javascript'});
+    	res.write(data);
+    	res.end();
+		});
+	} else if(req.url.indexOf('.css') != -1) {
+		fs.readFile('/css/style.css', function (err, data) {
+        if (err) console.log(err);
+        res.writeHead(200, {'Content-Type': 'text/css'});
+        res.write(data);
+        res.end();
+      });
+	} else {
+		console.log('Error: Request not found for client');
+		res.end('Error: Request not found');
+	};
 }
 
 function serveHTML(req, res) {
