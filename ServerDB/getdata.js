@@ -1,8 +1,8 @@
 var http = require('http');
 var server = http.createServer(requestHandler);
-var mysql = require(mysql);
+var mysql = require('mysql');
 var conn = connectToDatabase();
-var queryString = require(queryString);
+//var queryString = require(queryString);
 
 conn.connect(function(error) {
 	if(error) { console.log("Unable to connect to database"); }
@@ -11,6 +11,8 @@ conn.connect(function(error) {
 server.listen(1337);
 
 function requestHandler(req, res) {
+	console.log("Someone connected");
+	console.log(req);
 	if(req.method != "POST")
 		res.end("Error: Invalid request method")
 	switch(req.url) {
@@ -24,21 +26,22 @@ function requestHandler(req, res) {
 
 var requiredForRetrieve = ['college','startDate','endDate'];
 function retrieveData(chunk, req, res) {
-	var data = queryString.parse(chunk.toString());
+	var data = JSON.parse(chunk.toString());
 	if(isRequiredSet(data, requiredForRetrieve)) {
 		replyMissingInputs(res);
 		return;
 	}
 	
-	var query = "SELECT * FROM `sleepdata` WHERE `college` = '" + data.college + 
+	var query = "SELECT `date_before_bed`, `bedtime`, `waketime` FROM `sleepdata` WHERE `college` = '" + data.college + 
 				"' AND `date_before_bed` > '" + data.startDate + 
 				"' AND `date_before_bed` < '" + data.endDate + "';";
 	conn.query(query, function(error, rows, fields) {
 		if(error) {
 			console.log("Error retrieving data");
 			console.log("Data sent: " + data);
+			replyErrorRetrieveingData(res);
 		} else {
-			
+			res.end(JSON.stringify(rows));
 		}
 	});
 }
@@ -64,4 +67,8 @@ function connectToDatabase() {
 
 function replyMissingInputs(res) {
 	res.end('{"success":false, "error":"missing required input"}');
+}
+
+function replyErrorRetrieveingData(res) {
+	res.end('{"success":false, "error":"error retrieving data from database"}');
 }
