@@ -2,7 +2,7 @@ var http = require('http');
 var server = http.createServer(requestHandler);
 var mysql = require('mysql');
 var conn = connectToDatabase();
-//var queryString = require(queryString);
+var queryString = require('queryString');
 
 conn.connect(function(error) {
 	if(error) { console.log("Unable to connect to database"); }
@@ -10,6 +10,7 @@ conn.connect(function(error) {
 });
 server.listen(1337);
 
+//Main Request Handler
 function requestHandler(req, res) {
 	console.log("Someone connected");
 	console.log(req);
@@ -24,7 +25,9 @@ function requestHandler(req, res) {
 	}
 }
 
+//Required values to retrieve data in range
 var requiredForRetrieve = ['college','startDate','endDate'];
+//Retrieve all data points in range for one school
 function retrieveData(chunk, req, res) {
 	var data = JSON.parse(chunk.toString());
 	if(isRequiredSet(data, requiredForRetrieve)) {
@@ -46,6 +49,7 @@ function retrieveData(chunk, req, res) {
 	});
 }
 
+//---- Utility Functions -----
 function isRequiredSet(data, required) {
 	for(var i =0; i < required.length; i++) {
 		if(data[required[i]] === undefined) {
