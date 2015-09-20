@@ -3,7 +3,7 @@
 	
 	"name": "SleepBox",
 	"description": "This extension will record your sleep patterns and combine them with others' on your college campus to track overall trends.",
-	"version": "0.7.2",
+	"version": "0.9.1",
 	
 	
 	"browser_action": {
@@ -11,9 +11,14 @@
 		"default_title": "SleepBox"
 	},
 	"permissions": [
+		"http://172.27.30.126:8080/",
 		"storage",
+		"notifications",
 		"https://ajax.googleapis.com/"
 	],
+	"icons": {
+		"128" : "logo.png"
+	},
 	"content_scripts": [
 		{
 			"matches": ["http://www.google.com/*"],

@@ -40,3 +40,12 @@ body{
 	position: fixed;
 	top: 250px;
 }
+
+.dateSelect{
+	width: 80%;
+	height: 90%;
+	margin: auto;
+	position: fixed;
+	margin-top: 1%;
+	top: -250px;
+}
