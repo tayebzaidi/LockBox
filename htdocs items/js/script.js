@@ -36,6 +36,10 @@ function generateChart() {
 }
 function generateChartCallback(dates, hours) {
 	c3.generate({
+		size: {
+			height: 500,
+			width: 1200
+		},
 		bindto: '#chart',
 		data: {
 			columns: [
@@ -51,7 +55,7 @@ function generateChartCallback(dates, hours) {
 		},
 		legend: {
 			show: false
-		}
+		},
 	});
 }
 
