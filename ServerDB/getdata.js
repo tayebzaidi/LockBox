@@ -2,6 +2,7 @@ var http = require('http');
 var server = http.createServer(requestHandler);
 var mysql = require('mysql');
 var conn = connectToDatabase();
+var fs = require('fs');
 var queryString = require('queryString');
 
 conn.connect(function(error) {
@@ -12,30 +13,70 @@ server.listen(1337);
 
 //Main Request Handler
 function requestHandler(req, res) {
-	console.log("Someone connected");
-	console.log(req);
-	if(req.method != "POST")
-		res.end("Error: Invalid request method")
-	switch(req.url) {
-		case('/retreive'):
-			req.on('data', function(chunk) { retrieveData(chunk, req, res); });
-			retrieveData(req, res);
-		default:
-			res.end("Error");
+	console.log("Recieved request");
+	if(req.method != "POST"){
+		serveHTML(req, res);
+	} else {
+		switch(req.url) {
+			case('/raw'):
+				req.on('data', function(chunk) { retrieveData(chunk, req, res); });
+				break;
+			case('/averages'):
+				req.on('data', function(chunk) { retrieveDataAverages(chunk, req, res); });
+				break;
+			default:
+				res.end("Error");
+		}
 	}
+}
+
+function serveHTML(req, res) {
+	fs.readFile('index.html', function (err, data) {
+    	if (err) {
+     		res.writeHead(500);
+      		return res.end('Error loading index.html');
+    	}
+
+    	res.writeHead(200);
+    	res.end(data);
+  	});
 }
 
 //Required values to retrieve data in range
 var requiredForRetrieve = ['college','startDate','endDate'];
 //Retrieve all data points in range for one school
 function retrieveData(chunk, req, res) {
+	var data = queryString.parse(chunk.toString());
+	if(!isRequiredSet(data, requiredForRetrieve)) {
+		replyMissingInputs(res);
+		return;
+	}
+	
+	var query = "SELECT `date_before_bed`, `bedtime`, `waketime` FROM `sleepdata` WHERE `college` = '" + data.college + 
+				"' AND `date_before_bed` > '" + data.startDate + 
+				"' AND `date_before_bed` < '" + data.endDate + "';";
+	conn.query(query, function(error, rows, fields) {
+		if(error) {
+			console.log("Error retrieving data");
+			console.log("Data sent: " + data);
+			replyErrorRetrieveingData(res);
+		} else {
+			res.end(JSON.stringify(rows));
+		}
+	});
+}
+
+//Required values to retrieve data in range
+var requiredForRetrieveAverages = ['college','startDate','endDate'];
+//Retrieve all data points in range for one school
+function retrieveDataAverages(chunk, req, res) {
 	var data = JSON.parse(chunk.toString());
 	if(isRequiredSet(data, requiredForRetrieve)) {
 		replyMissingInputs(res);
 		return;
 	}
 	
-	var query = "SELECT `date_before_bed`, `bedtime`, `waketime` FROM `sleepdata` WHERE `college` = '" + data.college + 
+	var query = "SELECT `date_before_bed`, `bedtime`, `waketime` FROM `dayaverages` WHERE `college` = '" + data.college + 
 				"' AND `date_before_bed` > '" + data.startDate + 
 				"' AND `date_before_bed` < '" + data.endDate + "';";
 	conn.query(query, function(error, rows, fields) {
@@ -83,6 +124,8 @@ function updateAverages(college, date, bedtime, waketime) {
 		}
 	});	
 }
+
+
 
 function dateTimeToTimeString(dateTime) {
 	return "" + dateTime.getHours() + ":" + dateTime.getMinutes() + ":" + dateTime.getSeconds();
@@ -146,7 +189,7 @@ function connectToDatabase() {
 }
 
 function replyMissingInputs(res) {
-	res.end('{"success":false, "error":"missing required input"}');
+	res.end(JSON.stringify('{"success":false, "error":"missing required input"}'));
 }
 
 function replyErrorRetrieveingData(res) {
