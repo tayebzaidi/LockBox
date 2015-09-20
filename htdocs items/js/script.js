@@ -28,6 +28,7 @@ function transformToArray(data) {
 		var timeSplit = data.rows[i]['average_sleep'].split(':');
 		averageHours.push(parseInt(timeSplit[0]) + parseInt(timeSplit[1]) / 60);
 	}
+	dates.reverse();
 	return {'dates':dates,'averageHours':averageHours};
 }
 
