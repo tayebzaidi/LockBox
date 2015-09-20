@@ -1,0 +1,52 @@
+<!doctype html>
+
+<html>
+	<head>
+		<title>SleepBox</title>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+		<link rel="stylesheet" href="main.css"/>
+		<script src="jquery-small.js"></script>
+		<script src="popup.js"></script>
+	</head>
+	
+	<body>
+	<div class="row">
+		<div class="collegeEntry">
+			<h1>Welcome to SleepBox!</h1>
+			<form>
+				<div class="form-group">
+					<label for="selectCollege">Choose your college:</label>
+						<select class="form-control" id="selectCollege">
+							<option></option>
+							<option>Carleton College</option>
+							<option>Macalester College</option>
+							<option>Washington University in St. Louis</option>
+						</select>
+				</div>
+				<div class="btn btn-default" id="collegeButton">Submit</div>
+			</form>
+		</div>		
+		
+		<div class="sleepEntry">
+			<h1 id="welcomeMessage"></h1>
+			<h3>How did you sleep last night?</h3>
+			<form>
+				<div class="form-group">
+					<label for="bedtime">What time did you go to bed last night?</label>
+					<input type="time" style="color:black;" id="bedtime">
+				</div>
+				<div class="form-group">
+					<label for="waketime">What time did you wake up this morning?</label>
+					<input type="time" style="color:black;" id="waketime">
+				</div>
+				<div class="btn btn-default" id="sleepButton">Submit</div>
+			</form>
+		</div>
+	</div>
+	<div class="thanks">
+		<h2>Thanks for putting in your sleep info today!</h2>
+		<h3>Check out our website for your personal and school information!</h3>
+		<a type="button" class="btn btn-default btn-lg" href="#">Go to SleepBox</a>
+	</div>
+	</body>
+</html>

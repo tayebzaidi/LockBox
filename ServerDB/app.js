@@ -4,7 +4,6 @@ var http = require('http');
 http.createServer(function (req, res) {
 	res.writeHead(200, {
 		'Content-Type': 'text/plain'
-	});
 	res.write('Message Received!');
 	//res.end();
 	
@@ -25,6 +24,7 @@ http.createServer(function (req, res) {
 	} else {
 		console.log("Not Post");
 	}
+	response.end();
 }).listen(8080);
 
 /*
