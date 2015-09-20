@@ -4,6 +4,7 @@ console.log("Deploying node server...");
 var http = require('http');
 var mysql = require('mysql');
 var fs = require('fs');
+var util = require('util');
 try {
 	var queryString = require('querystring'); //Linux
 } catch(exception) {
@@ -24,24 +25,34 @@ console.log("Node server deployed.");
 
 //Main Request Handler
 function requestHandler(req, res) {
-	console.log("Someone connected");
+	console.log("Requiest recieved.");
 	if(req.method == "GET") {
-		res.end("GET not support, sry");
+		res.end("No GET functions used.");
 		return;
 	} else if(req.method == "POST") {
-		req.on('data', function(chunk) { handleRequest(chunk, req, res); });
+		req.on('data', function(chunk) { processData(chunk, req, res); });
 	} else {
-		console.log('Request method not found');
-		res.end('Error: Request method not found');
+		console.log('User attempted method: ' + req.method);
+		res.end('Request method not used.');
 	}
 }
 
-function handleRequest(chunk, req, res) {
-	var data = JSON.parse(chunk);
+//Proess data sent with request
+function processData(chunk, req, res) {
+	//Transform data to json. 
+	try {
+		var data = JSON.parse(chunk.toString());
+	} catch (execption) {
+		var data = JSON.parse(chunk);
+	}
+	
+	//Function must be provided
 	if(data.function == undefined) {
 		res.end(JSON.stringify({'success' : false, 'error' : "no function given"}));
 		return;
 	}
+	
+	//Pass request to proper method
 	switch(data.function) {
 		case('insert'):
 			insertData(data, req, res);
@@ -61,15 +72,18 @@ function handleRequest(chunk, req, res) {
 	}
 }
 
+//Required values to insert data
+var requiredForInsert = ['college','waketime','bedtime'];
 
+//Insert one day of sleep information into the database
 function insertData(data, req, res) {
-	if(isRequiredSet(data, requiredForRetrieve)) {
+	if(!isRequiredSet(data, requiredForInsert)) {
 		replyMissingInputs(res);
 		return;
 	}
 	
-	var insertQuery = "INSERT INTO sleepdata (`date_before_bed`, `bedtime`, `waketime`, `college`)" +
-				 "VALUES ('" + data.date + "','" + data.bedtime + "','" + data.waketime + "','" + data.college + "')"
+	var insertQuery = util.format("INSERT INTO sleepdata (`date_before_bed`, `bedtime`, `waketime`, `college`)" +
+				 "VALUES ('%s','%s','%s','%s')",data.date, data.bedtime, data.waketime, data.college);
 	conn.query(insertQuery, function(error, rows, fields) {
 		if(error) {
 			console.log("Error inputting data");
