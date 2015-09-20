@@ -6,7 +6,7 @@ var dataPoint;
 var dataPoints = [];
 
 function collectSleepData(college){
-	document.getElementById('welcomeMessage').innerHTML = 'Welcome back!';
+	document.getElementById("firstSlide").style.left = "-500px";
 	$('.sleepEntry').animate({
 		left: '0px'
 	}, 200);
@@ -40,6 +40,11 @@ function collectSleepData(college){
 				$('.thanks').animate({
 					top: '0px'
 				}, 200);
+				$('#outsideLink').click(function(){
+					chrome.storage.sync.clear(function(){
+						console.log("Wipe complete.");
+					});
+				});
 			});	
 		}
 	});	
@@ -48,9 +53,9 @@ function collectSleepData(college){
 function sendToServer(college, bedtime, waketime, date){
 	$.ajax({
 		type: "POST",
-		url: "http://172.27.30.126:8080/insert",
+		url: "http://172.27.30.126/node/insert",
 		data: JSON.stringify({
-			"college" : "Macalester College",
+			"college" : college,
 			"bedtime" : bedtime, 
 			"waketime" : waketime, 
 			"date" : date
@@ -61,19 +66,8 @@ function sendToServer(college, bedtime, waketime, date){
 
 $(document).ready(function(){
 	chrome.storage.sync.get(function(items){
-		var tempArray = items['dataPoints'];
-		console.log(tempArray);
-		var lastPost = tempArray[length];
-		console.log(lastPost);
-		var lastTime = lastPost['date'];
-		/*if(lastTime.getDate() != date.getDate()){	
-			chrome.notifications.create('Missed Day', iconUrl = 'notification.png', function(){
-				
-			});
-		}*/
-		console.log(items['college']);
 		if(items['college']){
-			console.log(items['college']);
+			document.getElementById('welcomeMessage').innerHTML = 'Welcome back!';
 			collectSleepData(items['college']);
 		}
 		else{

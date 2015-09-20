@@ -2,7 +2,7 @@
 
 <html>
 	<head>
-		<title>SleepBox</title>
+		<title>SleepEasy</title>
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 		<link rel="stylesheet" href="main.css"/>
 		<script src="jquery-small.js"></script>
@@ -11,8 +11,8 @@
 	
 	<div class="row">
 	<body>
-		<div class="collegeEntry">
-			<h1>Welcome to SleepBox!</h1>
+		<div class="collegeEntry" id="firstSlide">
+			<h1>Welcome to SleepEasy!</h1>
 			<form>
 				<div class="form-group">
 					<label for="selectCollege">Choose your college:</label>
@@ -45,7 +45,6 @@
 				</div>
 				<div class="row">
 					<div class="btn btn-default" id="sleepButton">Submit</div>
-					<!--<div class="btn btn-default" id="otherDates">Submit Entry for A Different Date</div>-->
 				</div>
 			</form>
 		</div>
@@ -53,24 +52,7 @@
 	<div class="thanks">
 		<h2>Thanks for putting in your sleep info today!</h2>
 		<h3>Check out our website for your personal and school information!</h3>
-		<a type="button" class="btn btn-default btn-lg" href="#">Go to SleepBox</a>
+		<a type="button" class="btn btn-default btn-lg" href="#" id="outsideLink">See Charts</a>
 	</div>
-		<!--<div class="dateSelect">
-			<form>
-				<div class="form-group">
-					<h5>Which date would you like to enter?</h5>
-					<input type="date" style="color: black;" id="pastDate">
-				</div>
-				<div class="form-group">
-					<h5>What time did you got to bed the night before that date?</h5>
-					<input type="time" style="color:black;" id="bedtime">
-				</div>
-				<div class="form-group">
-					<h5>What time did you wake up that morning?</h5>
-					<input type="time" style="color:black;" id="waketime">
-				</div>		
-				<div class="btn btn-default" id="pastDateButton">Submit</div>
-			</form>
-		</div>-->
 	</body>
 </html>
