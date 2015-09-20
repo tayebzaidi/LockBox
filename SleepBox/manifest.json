@@ -1,23 +1,28 @@
 {
 	"manifest_version": 2,
 	
-	"name": "SleepBox",
+	"name": "SleepEasy",
 	"description": "This extension will record your sleep patterns and combine them with others' on your college campus to track overall trends.",
-	"version": "0.9.1",
+	"version": "0.9.9",
 	
 	
 	"browser_action": {
 		"default_popup": "popup.html",
-		"default_title": "SleepBox"
+		"default_title": "SleepEasy"
 	},
 	"permissions": [
-		"http://172.27.30.126:8080/",
+		"http://172.27.30.126/",
 		"storage",
 		"notifications",
 		"https://ajax.googleapis.com/"
 	],
 	"icons": {
 		"128" : "logo.png"
+	},
+	"background": {
+		"scripts": [
+			"background.js"
+		]
 	},
 	"content_scripts": [
 		{
