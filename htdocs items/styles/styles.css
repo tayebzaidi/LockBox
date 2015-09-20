@@ -1,0 +1,24 @@
+body {
+    background-color: #35454A;
+}
+
+body * {
+    color: #C7C3CB;
+}
+
+text {    
+    fill: #C7C3CB;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #C7C3CB;
+  shape-rendering: crispEdges;
+}
+
+.line {
+  fill: none;
+  stroke: #C7C3CB;
+  stroke-width: 1.5px;
+}
