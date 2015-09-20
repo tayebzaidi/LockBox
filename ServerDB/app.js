@@ -18,8 +18,10 @@ server.listen(8080);
 
 function requestHandler(req, res) {
 	console.log("Someone connected");
-	if(req.method != "POST")
-		res.end("Error: Invalid request method")
+	if(req.method != "POST") {
+		res.end("Error: Invalid request method");
+		return;
+	}
 	switch(req.url) {
 		case('/retrieve'):
 			req.on('data', function(chunk) { retrieveData(chunk, req, res); });
@@ -59,12 +61,8 @@ function retrieveData(chunk, req, res) {
 }
 
 function insertData(chunk, req, res) {
-	console.log('cat');
-	console.log(typeof(chunk));
-	console.log(chunk);
+	console.log(req.method);
 	var data = JSON.parse(chunk);
-	console.log(data.waketime);
-	console.log('cat');
 	if(isRequiredSet(data, requiredForRetrieve)) {
 		replyMissingInputs(res);
 		return;
@@ -100,7 +98,7 @@ function connectToDatabase() {
 	var connection = mysql.createConnection({
   		host     : 'localhost',
 		user     : 'root',
-		password : 'strangehat',
+		password : '',
 		database : 'sleepbox'
 	});
 	return connection;
