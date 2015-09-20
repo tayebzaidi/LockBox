@@ -49,6 +49,65 @@ function retrieveData(chunk, req, res) {
 	});
 }
 
+
+
+
+
+
+function updateAverages(var college, var date, var bedtime, var waketime) {
+	var selectQuery = "SELECT `average_sleep`, `average_bedtime`, `average_waketime`, `count` FROM `dayaverages` WHERE `college` = '" + college + "' AND `date_before_bed` = '" + date + "' LIMIT 1";
+	conn.query(selectQuery, function(error, rows, fields) {
+		var sleptTime = getTimeSlept(bedtime, waketime);
+		if(rows.length == 0) {
+			var insertQuery = "INSERT INTO `dayaverages` (`college`, `date_before_bed`, `average_sleep`, `average_bedtime`, `average_waketime`, `count`) VALUES ('" + college + "', '" + date + "','" + sleptTime + "','" + bedtime + "','" + waketime + "');"
+			conn.query(insertQuery, function(error, rows, fields) {
+				
+			});
+		} else {
+			var averageSleep = rows[0]['average_sleep'];
+			var averageBedtime = rows[0]['average_bedtime'];
+			var averageWaketime = rows[0]['average_waketime'];
+			var count = rows[0]['count'];
+			
+			
+		}
+	});
+	
+	
+	
+	
+}
+
+function timeStringToMinutes(var timeString) {
+	var tokens = timeString.split(':');
+	return parseInt(tokens[0]) * 60 +  parseInt(tokens[1]);
+}
+
+function hourFromString(var timeString) {
+	var tokens = timeString.split(':');
+	return parseInt(tokens[0]);
+}
+
+function minutesFromString(var timeString) {
+	var tokens = timeString.split(':');
+	return parseInt(tokens[1]);
+}
+
+//Return a Date option with the time equal to time slept, date set to jan 1 1900 or something
+//Just get the hours and minutes for SQL query
+function getTimeSlept(var bedtime, var waketime) {
+	var bedMinutes = bedtime.getMinutes() + bedtime.getHours() * 60;
+	if(bedtime.getHours() < 13)
+		bedHours += 1440;
+		
+	var wakeMinutes = waketime.getMintues() + waketime.getHours() * 60 + 1440;
+
+	var sleptHoursDecimal = (wakeMinutes - bedMinutes) / 60;
+	var sleptHours = Math.floor(sleptHoursDecimal);
+	var sleptMinutes = (sleptHoursDecimal - sleptHours) * 60;
+	return new Date(1900, 00, 01, sleptHours, sleptMinutes, 0, 0);
+}
+
 //---- Utility Functions -----
 function isRequiredSet(data, required) {
 	for(var i =0; i < required.length; i++) {
