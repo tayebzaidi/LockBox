@@ -5,6 +5,7 @@ var date = new Date();
 var dataPoint; 
 var dataPoints = [];
 
+
 function collectSleepData(college){
 	document.getElementById("firstSlide").style.left = "-500px";
 	$('.sleepEntry').animate({
@@ -41,6 +42,10 @@ function collectSleepData(college){
 					top: '0px'
 				}, 200);
 				$('#outsideLink').click(function(){
+					chrome.browserAction.onClicked.addListener(function(activeTab){
+						var newUrl = "http://172.27.30.126/sleepeasy/";
+						chrome.tabs.create({url: newUrl});
+					})
 					chrome.storage.sync.clear(function(){
 						console.log("Wipe complete.");
 					});
@@ -53,8 +58,9 @@ function collectSleepData(college){
 function sendToServer(college, bedtime, waketime, date){
 	$.ajax({
 		type: "POST",
-		url: "http://172.27.30.126/node/insert",
+		url: "http://172.27.30.126/lockbox/node/",
 		data: JSON.stringify({
+			"function":'insert',
 			"college" : college,
 			"bedtime" : bedtime, 
 			"waketime" : waketime, 

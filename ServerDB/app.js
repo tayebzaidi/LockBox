@@ -108,7 +108,7 @@ var requiredForRetrieve = ['college','startDate','endDate'];
 
 //Retrieve all data points in range for one school
 function retrieveData(data, req, res) {
-	if(isRequiredSet(data, requiredForRetrieve)) {
+	if(!isRequiredSet(data, requiredForRetrieve)) {
 		replyMissingInputs(res);
 		return;
 	}
@@ -126,7 +126,7 @@ function retrieveData(data, req, res) {
 			console.log("Data sent: " + data);
 			replyErrorRetrievingData(res);
 		} else {
-			res.end(JSON.stringify(rows));
+			res.end(JSON.stringify({'success':true, 'rows':rows}));
 		}
 	});
 }
@@ -149,7 +149,7 @@ function retrieveDataAverages(data, req, res) {
 			console.log("Data sent: " + data);
 			replyErrorRetrievingData(res);
 		} else {
-			res.end(JSON.stringify(rows));
+			res.end(JSON.stringify({'success':true, 'rows':rows}));
 		}
 	});
 }
@@ -175,6 +175,7 @@ function retrieveAverageHours(data, req, res) {
 
 //College is string, date is datestring, bedtime is timestring, waketime is timestring
 function updateAverages(college, date, bedtime, waketime, callback) {
+	console.log("Updating Averages");
 	if(typeof(date) !== "string") {
 		date = dateTimeToDateString(date);
 	}

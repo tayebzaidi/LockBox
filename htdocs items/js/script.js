@@ -28,6 +28,7 @@ function transformToArray(data) {
 		var timeSplit = data.rows[i]['average_sleep'].split(':');
 		averageHours.push(parseInt(timeSplit[0]) + parseInt(timeSplit[1]) / 60);
 	}
+	dates.reverse();
 	return {'dates':dates,'averageHours':averageHours};
 }
 
@@ -36,6 +37,10 @@ function generateChart() {
 }
 function generateChartCallback(dates, hours) {
 	c3.generate({
+		size: {
+			height: 500,
+			width: 1200
+		},
 		bindto: '#chart',
 		data: {
 			columns: [
@@ -51,7 +56,7 @@ function generateChartCallback(dates, hours) {
 		},
 		legend: {
 			show: false
-		}
+		},
 	});
 }
 

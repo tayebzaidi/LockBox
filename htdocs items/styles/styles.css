@@ -22,3 +22,10 @@ text {
   stroke: #C7C3CB;
   stroke-width: 1.5px;
 }
+#chart {
+	height = 80vh;
+}
+
+svg {
+	height = 80vh; 
+}

@@ -1,10 +1,12 @@
 function getDatesAndAll(callback) {
+	console.log("cat");
 	console.log("Sending request all");
 	$.ajax({
 		type:"POST",
 		url:"/lockbox/node",
 		data: JSON.stringify({
 			'function': "raw",
+			'college':"Macalester College",
 			'startDate': "2015-08-01",
 			'endDate' : "2015-09-31"
 		}), 
@@ -14,12 +16,13 @@ function getDatesAndAll(callback) {
 }
 
 function getDatesAndAllSuccess(data, callback) {
+	console.log(data);
 	if(!(typeof(data) === "object" || typeof(data) === "Object")) {
 		data = JSON.parse(data);
 	}
 	transformation = transformToArray2(data);
 	console.log(transformation);
-	callback(transformation['dates'], transformation['sleptamount']);
+	callback(transformation['dates'], transformation['hours']);
 }
 
 function transformToArray2(data) {
@@ -30,19 +33,25 @@ function transformToArray2(data) {
 		
 		bedtime = data.rows[i]['bedtime'];
 		waketime = data.rows[i]['waketime'];
-		slepttime = getTimeSlept(bedtime, waketime);
+		var slepttime = getTimeSlept(bedtime, waketime);
 		
-		sleptamount.push(hourFromTimeString(slepttime) +  timeStringToMinutes(sleptTime) / 60);
+		sleptamount.push(hourFromTimeString(slepttime) +  (minutesFromTimeString(slepttime) / 60));
 	}
-	return {'dates':dates,'sleptamount':bedtimes};
+	return {'dates':dates,'hours':sleptamount};
 }
 
 
 function generateChart() {
-	getDatesAndAverageHoursArrays(generateChartCallback);
+	console.log("DOG");
+	getDatesAndAll(generateChartCallback);
 }
 function generateChartCallback(dates, hours) {
+	console.log(hours);
 	c3.generate({
+		size: {
+			height: 500,
+			width: 1200
+		},
 		bindto: '#chart',
 		data: {
 			columns: [
@@ -53,7 +62,10 @@ function generateChartCallback(dates, hours) {
 		axis: {
 			x: {
 				type: 'category',
-				categories: dates
+				categories: dates,
+				tick: {
+					format: function (x) { return ''; }
+				}
 			}
 		},
 		legend: {
@@ -62,7 +74,7 @@ function generateChartCallback(dates, hours) {
 	});
 }
 
-
+generateChart();
 
 
 function dateTimeToDateString(dateTime) {
