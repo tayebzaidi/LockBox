@@ -5,6 +5,8 @@ var http = require('http');
 var mysql = require('mysql');
 var fs = require('fs');
 var util = require('util');
+var validator = require('validator');
+
 try {
 	var queryString = require('querystring'); //Linux
 } catch(exception) {
@@ -110,7 +112,11 @@ function retrieveData(data, req, res) {
 		replyMissingInputs(res);
 		return;
 	}
-	
+	//validate 'college', 'startDate', 'endDate' by escaping
+    var sanitizeCollege = validator.escape(data.college);
+    var sanitizeStartDate = validator.escape(data.startDate);
+    var sanitizeEndDate = validator.escape(data.endDate);
+
 	var query = "SELECT `date_before_bed`, `bedtime`, `waketime` FROM `sleepdata` WHERE `college` = '" + data.college + 
 				"' AND `date_before_bed` > '" + data.startDate + 
 				"' AND `date_before_bed` < '" + data.endDate + "';";
@@ -300,7 +306,7 @@ function connectToDatabase() {
 	var connection = mysql.createConnection({
   		host     : 'localhost',
 		user     : 'root',
-		password : '',
+		password : 'strangehat',
 		database : 'sleepbox'
 	});
 	return connection;
