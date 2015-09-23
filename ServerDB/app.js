@@ -308,7 +308,7 @@ function connectToDatabase() {
 	var connection = mysql.createConnection({
   		host     : 'localhost',
 		user     : 'root',
-		password : 'strangehat',
+		password : '',
 		database : 'sleepbox'
 	});
 	return connection;
