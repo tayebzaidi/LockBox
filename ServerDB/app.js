@@ -86,10 +86,11 @@ function insertData(data, req, res) {
 	
 	var insertQuery = util.format("INSERT INTO sleepdata (`date_before_bed`, `bedtime`, `waketime`, `college`)" +
 				 "VALUES ('%s','%s','%s','%s')",data.date, data.bedtime, data.waketime, data.college);
+	console.log(insertQuery);
 	conn.query(insertQuery, function(error, rows, fields) {
 		if(error) {
-			console.log("Error inputting data");
-			console.log("Data sent: " + data);
+			console.log("Error inputting data: " + error);
+			console.log("Data sent: " + data.toString());
 			replyErrorRetrievingData(res);
 		} else {
 			console.log(data.college);
