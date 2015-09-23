@@ -3,7 +3,7 @@
 	
 	"name": "SleepEasy",
 	"description": "This extension will record your sleep patterns and combine them with others' on your college campus to track overall trends.",
-	"version": "0.9.9",
+	"version": "1.0",
 	
 	
 	"browser_action": {
@@ -14,6 +14,7 @@
 		"http://172.27.30.126/",
 		"storage",
 		"notifications",
+		"tabs",
 		"https://ajax.googleapis.com/"
 	],
 	"icons": {
