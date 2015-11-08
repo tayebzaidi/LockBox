@@ -25,14 +25,14 @@ conn.connect(function(error) {
 //var server = http.createServer(requestHandler);
 //server.listen(1337);
 var app = express();
-app.use('/', express.static(__dirname + '../public'));
-app.post('/node', requestHandler);
+app.use('/', express.static(__dirname + '/../public'));
+app.post('/lockbox/node', requestHandler);
 
 var server = app.listen(3000, function() {
 	var host = server.address().address;
 	var port = server.address().port;
 })
-express.listen(3000);
+
 console.log("Express Node server deployed.");
 
 //recalculateAverages();
@@ -318,7 +318,7 @@ function connectToDatabase() {
 	var connection = mysql.createConnection({
   		host     : 'localhost',
 		user     : 'root',
-		password : '',
+		password : 'strangehat',
 		database : 'sleepbox'
 	});
 	return connection;
