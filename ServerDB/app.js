@@ -2,6 +2,7 @@ console.log("Deploying node server...");
 
 //Load dependencies
 var http = require('http');
+var express = require('express');
 var mysql = require('mysql');
 var fs = require('fs');
 var util = require('util');
@@ -21,9 +22,18 @@ conn.connect(function(error) {
 })
 
 //Begin event loop
-var server = http.createServer(requestHandler);
-server.listen(1337);
-console.log("Node server deployed.");
+//var server = http.createServer(requestHandler);
+//server.listen(1337);
+var app = express();
+app.use('/', express.static(__dirname + '/../public'));
+app.post('/lockbox/node', requestHandler);
+
+var server = app.listen(3000, function() {
+	var host = server.address().address;
+	var port = server.address().port;
+})
+
+console.log("Express Node server deployed.");
 
 //recalculateAverages();
 
@@ -308,7 +318,7 @@ function connectToDatabase() {
 	var connection = mysql.createConnection({
   		host     : 'localhost',
 		user     : 'root',
-		password : '',
+		password : 'strangehat',
 		database : 'sleepbox'
 	});
 	return connection;
