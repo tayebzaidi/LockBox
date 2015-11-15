@@ -3,23 +3,13 @@ console.log("Deploying node server...");
 //Load dependencies
 var http = require('http');
 var express = require('express');
-var mysql = require('mysql');
 var fs = require('fs');
 var util = require('util');
 var validator = require('validator');
+var dal = require('./dal');
 
-try {
-	var queryString = require('querystring'); //Linux
-} catch(exception) {
-	var queryString = require('queryString'); //Windows
-}
 
-//Connect to server
-var conn = connectToDatabase();
-conn.connect(function(error) {
-	if(error) { console.log("Unable to connect to database"); }
-	else      { console.log("Connected to database"); }
-})
+
 
 //Begin event loop
 //var server = http.createServer(requestHandler);
@@ -123,21 +113,11 @@ function retrieveData(data, req, res) {
 		replyMissingInputs(res);
 		return;
 	}
-	//validate 'college', 'startDate', 'endDate' by escaping
-    var sanitizeCollege = validator.escape(data.college);
-    var sanitizeStartDate = validator.escape(data.startDate);
-    var sanitizeEndDate = validator.escape(data.endDate);
 
-	var query = "SELECT `date_before_bed`, `bedtime`, `waketime` FROM `sleepdata` WHERE `college` = '" + data.college + 
-				"' AND `date_before_bed` > '" + data.startDate + 
-				"' AND `date_before_bed` < '" + data.endDate + "';";
-	conn.query(query, function(error, rows, fields) {
+	dal.retrieveData(data.college, data.startDate, data.endDate, function(error, rows, fields) {
 		if(error) {
-			console.log("Error retrieving data");
-			console.log("Data sent: " + data);
 			replyErrorRetrievingData(res);
 		} else {
-			console.log(rows);
 			res.end(JSON.stringify({'success':true, 'rows':rows}));
 		}
 	});
@@ -145,6 +125,7 @@ function retrieveData(data, req, res) {
 
 //Required values to retrieve data in range
 var requiredForRetrieveAverages = ['college','startDate','endDate'];
+
 //Retrieve all data points in range for one school
 function retrieveDataAverages(data, req, res) {
 	if(isRequiredSet(data, requiredForRetrieve)) {
@@ -152,13 +133,8 @@ function retrieveDataAverages(data, req, res) {
 		return;
 	}
 	
-	var query = "SELECT `date_before_bed`, `bedtime`, `waketime` FROM `dayaverages` WHERE `college` = '" + data.college + 
-				"' AND `date_before_bed` > '" + data.startDate + 
-				"' AND `date_before_bed` < '" + data.endDate + "';";
-	conn.query(query, function(error, rows, fields) {
+	dal.retrieveDataAverages(data.college, data.startDate, data.endDate, function(error, rows, fields) {
 		if(error) {
-			console.log("Error retrieving data");
-			console.log("Data sent: " + data);
 			replyErrorRetrievingData(res);
 		} else {
 			res.end(JSON.stringify({'success':true, 'rows':rows}));
@@ -179,15 +155,7 @@ function isRequiredSet(data, required) {
 	return true; 
 } 
 
-function connectToDatabase() {
-	var connection = mysql.createConnection({
-  		host     : 'localhost',
-		user     : 'root',
-		password : '',
-		database : 'sleepbox'
-	});
-	return connection;
-}
+
 
 function replyMissingInputs(res) {
 	res.end('{"success":false, "error":"missing required input"}');
