@@ -6,7 +6,7 @@ function getDatesAndAll(callback) {
 		data: JSON.stringify({
 			'function': "raw",
 			'college':"Macalester College",
-			'startDate': "2013-08-01",
+			'startDate': "2013-08-01",	
 			'endDate' : "2015-09-31"
 		}), 
 		dataType: "json",

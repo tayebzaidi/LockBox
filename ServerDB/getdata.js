@@ -46,7 +46,6 @@ function serveHTML(req, res) {
 var requiredForRetrieve = ['college','startDate','endDate'];
 //Retrieve all data points in range for one school
 function retrieveData(chunk, req, res) {
-	console.log("KITTEN");
 	var data = queryString.parse(chunk.toString());
 	if(!isRequiredSet(data, requiredForRetrieve)) {
 		replyMissingInputs(res);
@@ -59,11 +58,9 @@ function retrieveData(chunk, req, res) {
 	conn.query(query, function(error, rows, fields) {
 		if(error) {
 			console.log("Error retrieving data");
-			console.log(error);
 			console.log("Data sent: " + data);
 			replyErrorRetrieveingData(res);
 		} else {
-			console.log(rows);
 			res.end(JSON.stringify(rows));
 		}
 	});

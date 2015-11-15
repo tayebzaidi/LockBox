@@ -167,6 +167,8 @@ function retrieveDataAverages(data, req, res) {
 }
 
 
+
+
 //---- Utility Functions -----
 function isRequiredSet(data, required) {
 	for(var i =0; i < required.length; i++) {
