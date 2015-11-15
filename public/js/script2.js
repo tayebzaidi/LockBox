@@ -1,5 +1,4 @@
 function getDatesAndAll(callback) {
-	console.log("cat");
 	console.log("Sending request all");
 	$.ajax({
 		type:"POST",
@@ -7,7 +6,7 @@ function getDatesAndAll(callback) {
 		data: JSON.stringify({
 			'function': "raw",
 			'college':"Macalester College",
-			'startDate': "2015-08-01",
+			'startDate': "2013-08-01",
 			'endDate' : "2015-09-31"
 		}), 
 		dataType: "json",
@@ -27,17 +26,17 @@ function getDatesAndAllSuccess(data, callback) {
 
 function transformToArray2(data) {
 	var dates = [];
-	var sleptamount = [];
+	var sleptAmount = [];
 	for(var i=0; i<data.rows.length; i = i + 1) {
 		dates.push(data.rows[i]['date_before_bed'].split('T')[0]);
 		
 		bedtime = data.rows[i]['bedtime'];
 		waketime = data.rows[i]['waketime'];
-		var slepttime = getTimeSlept(bedtime, waketime);
+		var slepttime = getTimeSlept(bedtime	, waketime);
 		
-		sleptamount.push(hourFromTimeString(slepttime) +  (minutesFromTimeString(slepttime) / 60));
+		sleptAmount.push(hourFromTimeString(slepttime) +  (minutesFromTimeString(slepttime) / 60));
 	}
-	return {'dates':dates,'hours':sleptamount};
+	return {'dates':dates,'hours':sleptAmount};
 }
 
 
