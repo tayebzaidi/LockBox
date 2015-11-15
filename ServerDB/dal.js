@@ -65,6 +65,7 @@ function insertData(college, bedDateTime, wakeDateTime, req, res, callback) {
 			callback(error, rows, fields);
 		} else {
 			callback(error, rows, fields);
+			//TODO update averages
 		}
 	});
 }
