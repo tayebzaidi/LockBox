@@ -1,6 +1,7 @@
 module.export = {
 	retrieveData : retrieveData,
-	retrieveDataAverages : retrieveDataAverages
+	retrieveDataAverages : retrieveDataAverages,
+	insertData : insertData
 }
 
 var mysql = require('mysql');
