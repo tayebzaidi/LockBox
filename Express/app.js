@@ -1,4 +1,5 @@
 var express = require('express');
+var other = require('./other')
 var app = express();
 app.get('/dog', function(req, res) {
 	res.end("<h1> DOG </h1>");
@@ -11,4 +12,5 @@ var server = app.listen(3000, function() {
 	var port = server.address().port;
 	
 	console.log('Example app listening at http://%s:%s', host, port);
+	console.log(other.add(1, 5))
 })
