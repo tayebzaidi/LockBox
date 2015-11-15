@@ -1,3 +1,8 @@
+module.export = {
+	retrieveData : retrieveData,
+	retrieveDataAverages : retrieveDataAverages
+}
+
 var mysql = require('mysql');
 var util = require('util');
 
@@ -45,5 +50,21 @@ function retrieveDataAverages(college, startDate, endDate, callback) {
 			console.log(util.format("Data sent - college : '%s', startDate : '%s', endDate : '%s'", college, startDate, endDate));
 		}
 		callback(error, rows, fields);
+	});
+}
+
+//Insert one day of sleep information into the database
+function insertData(college, bedDateTime, wakeDateTime, req, res, callback) {
+	var query = util.format("INSERT INTO sleepdata (`college`, `bed_datetime`, `wake_datetime`) VALUES ('%s','%s','%s','%s')", college, bedDateTime, wakeDateTime);
+
+	conn.query(query, function(error, rows, fields) {
+		if(error) {
+			console.log("Error inserting data into DB");
+			console.log("Query: " + query);
+			console.log("Data sent - college : %s, bedDateTime : %s, wakeDateTime : %s", college, bedDateTime, wakeDateTime);
+			callback(error, rows, fields);
+		} else {
+			callback(error, rows, fields);
+		}
 	});
 }
