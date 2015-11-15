@@ -8,12 +8,7 @@ var util = require('util');
 var validator = require('validator');
 var dal = require('./dal');
 
-
-
-
-//Begin event loop
-//var server = http.createServer(requestHandler);
-//server.listen(1337);
+//Start event loop
 var app = express();
 app.use('/', express.static(__dirname + '/../public'));
 app.post('/lockbox/node', requestHandler);
@@ -21,11 +16,10 @@ app.post('/lockbox/node', requestHandler);
 var server = app.listen(3000, function() {
 	var host = server.address().address;
 	var port = server.address().port;
+	console.log("Server hosted at %s:%s", host, port);
 })
 
 console.log("Express Node server deployed.");
-
-//recalculateAverages();
 
 //Main Request Handler
 function requestHandler(req, res) {
@@ -154,8 +148,6 @@ function isRequiredSet(data, required) {
 	}
 	return true; 
 } 
-
-
 
 function replyMissingInputs(res) {
 	res.end('{"success":false, "error":"missing required input"}');
