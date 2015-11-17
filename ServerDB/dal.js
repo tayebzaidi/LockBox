@@ -14,6 +14,9 @@ conn.connect(function(error) {
 	else      { console.log("Connected to database"); }
 })
 
+/**
+ * Connects to the SleepEasy database.
+ */
 function connectToDatabase() {
 	var connection = mysql.createConnection({
   		host     : 'localhost',
@@ -25,7 +28,14 @@ function connectToDatabase() {
 }
 
 
-//Retrieve all data points in range for one school
+/**
+ * Retrieves all of the data points for the given college in the date range
+ * Triggers the callback with error, rows, and fields from query. 
+ * @param <String> college
+ * @param <DateTime> startDate
+ * @param <DateTime> endDate
+ * @param <Function> callback
+ */
 function retrieveData(college, startDate, endDate, callback) {
 	var query = util.format("SELECT `date_before_bed`, `bedtime`, `waketime` FROM `sleepdata` WHERE `college` = '%s' AND `date_before_bed` > '%s' AND `date_before_bed` < '%s';",
 							college, startDate, endDate);
@@ -40,7 +50,14 @@ function retrieveData(college, startDate, endDate, callback) {
 	});
 }
 
-//Retrieve all data points in range for one school
+/**
+ * Retrieves sleep averages for given college in the date range.
+ * Triggers callback on finish with error, rows, and fields from query.
+ * @param <String> college
+ * @param <DateTime> startDate
+ * @param <DateTime> endDate
+ * @param <Function> callback
+ */
 function retrieveDataAverages(college, startDate, endDate, callback) {
 	var query = util.format("SELECT `date_before_bed`, `bedtime`, `waketime` FROM `dayaverages` WHERE `college` = '%s' AND `date_before_bed` > '%s' AND `date_before_bed` < '%s';", 
 							college, startDate, endDate);
@@ -54,8 +71,17 @@ function retrieveDataAverages(college, startDate, endDate, callback) {
 	});
 }
 
-//Insert one day of sleep information into the database
-function insertData(college, bedDateTime, wakeDateTime, req, res, callback) {
+/**
+ * Inserts one data point for the given college.
+ * Applied to date corresponding to time at midpoint of bed and wake. 
+ * 12 pm to 12 am apply to date at 12 pm. 
+ * Triggers callback on finish with error.
+ * @param <String> college
+ * @param <DateTime> bedDateTime
+ * @param <DateTime> wakeDateTime
+ * @param <Funciton> callback
+ */
+function insertData(college, bedDateTime, wakeDateTime, callback) {
 	var query = util.format("INSERT INTO sleepdata (`college`, `bed_datetime`, `wake_datetime`) VALUES ('%s','%s','%s','%s')", college, bedDateTime, wakeDateTime);
 
 	conn.query(query, function(error, rows, fields) {
@@ -63,9 +89,9 @@ function insertData(college, bedDateTime, wakeDateTime, req, res, callback) {
 			console.log("Error inserting data into DB");
 			console.log("Query: " + query);
 			console.log("Data sent - college : %s, bedDateTime : %s, wakeDateTime : %s", college, bedDateTime, wakeDateTime);
-			callback(error, rows, fields);
+			callback(error);
 		} else {
-			callback(error, rows, fields);
+			callback(error);
 			//TODO update averages
 		}
 	});
