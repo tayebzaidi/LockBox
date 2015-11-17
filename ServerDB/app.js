@@ -89,8 +89,6 @@ function insertData(data, req, res) {
 	});
 }
 	
-	
-
 //Required values to retrieve data in range
 var requiredForRetrieve = ['college','startDate','endDate'];
 
