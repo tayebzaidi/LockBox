@@ -21,7 +21,13 @@ var server = app.listen(3000, function() {
 
 console.log("Express Node server deployed.");
 
-//Main Request Handler
+
+/**
+ * Handles requests made to the server. 
+ * Passes all POST requests to processData
+ * @param <ServerRequest> req
+ * @param <ServerResponse> res
+ */
 function requestHandler(req, res) {
 	console.log("Request recieved.");
 	if(req.method == "GET") {
@@ -35,7 +41,14 @@ function requestHandler(req, res) {
 	}
 }
 
-//Proess data sent with request
+/**
+ * Processes data from a request. Probably incorrect at this point. 
+ * Should handle the fact that data comes in via chunking. At this point
+ * it is assuming that the whole request is in the chunk. Only post requests.
+ * @param <Object> chunk
+ * @param <ServerRequest> req
+ * @param <ServerResponse> res
+ */
 function processData(chunk, req, res) {
 	//Transform data to json. 
 	try {
@@ -73,7 +86,14 @@ function processData(chunk, req, res) {
 //Required values to insert data
 var requiredForInsert = ['college','waketime','bedtime'];
 
-//Insert one day of sleep information into the database
+/**
+ * Handles a request to insert one data point for a school.
+ * Verifies request, pulls information from data object. 
+ * Replies to the request with the success or an error. 
+ * @param <Object> data - Data from request
+ * @param <ServerRequest> req - Request object from request
+ * @param <ServerResponse> res - Response object form request
+ */
 function insertData(data, req, res) {
 	if(!isRequiredSet(data, requiredForInsert)) {
 		replyMissingInputs(res);
@@ -92,7 +112,14 @@ function insertData(data, req, res) {
 //Required values to retrieve data in range
 var requiredForRetrieve = ['college','startDate','endDate'];
 
-//Retrieve all data points in range for one school
+/**
+ * Handles a request for all data in date range for one school. 
+ * Verifies request, pulls information from data object. 
+ * Replies to the request with the data or an error. 
+ * @param <Object> data - Data from request
+ * @param <ServerRequest> req - Request object from request
+ * @param <ServerResponse> res - Response object form request
+ */
 function retrieveData(data, req, res) {
 	if(!isRequiredSet(data, requiredForRetrieve)) {
 		replyMissingInputs(res);
@@ -111,7 +138,14 @@ function retrieveData(data, req, res) {
 //Required values to retrieve data in range
 var requiredForRetrieveAverages = ['college','startDate','endDate'];
 
-//Retrieve all data points in range for one school
+/**
+ * Handles a request for data averages in date range for one school. 
+ * Verifies request, pulls information from data object. 
+ * Replies to the request with the data or an error. 
+ * @param <Object> data - Data from request
+ * @param <ServerRequest> req - Request object from request
+ * @param <ServerResponse> res - Response object form request
+ */
 function retrieveDataAverages(data, req, res) {
 	if(isRequiredSet(data, requiredForRetrieve)) {
 		replyMissingInputs(res);
@@ -130,7 +164,15 @@ function retrieveDataAverages(data, req, res) {
 
 
 
-//---- Utility Functions -----
+//------ Utility Functions -------
+
+/**
+ * Checks to see if the required values are present in the data object.
+ * Intended use for checking data objects from the client.
+ * @param <Object> data
+ * @param <Array> required
+ * @return <Boolean>
+ */
 function isRequiredSet(data, required) {
 	for(var i =0; i < required.length; i++) {
 		if(data[required[i]] === undefined) {
@@ -140,10 +182,18 @@ function isRequiredSet(data, required) {
 	return true; 
 } 
 
+/**
+ * Replies to the given request with missing input error.
+ * @param <ServerResponse> res
+ */
 function replyMissingInputs(res) {
 	res.end('{"success":false, "error":"missing required input"}');
 }
 
+/**
+ * Replies to the given request with database error. 
+ * @param <ServerResponse> res
+ */
 function replyErrorRetrievingData(res) {
 	res.end('{"success":false, "error":"error retrieving data from database"}');
 }
