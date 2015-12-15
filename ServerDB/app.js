@@ -5,7 +5,6 @@ var http = require('http');
 var express = require('express');
 var fs = require('fs');
 var util = require('util');
-var validator = require('validator');
 var dal = require('./dal');
 
 //Start event loop
