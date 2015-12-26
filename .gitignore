@@ -2,3 +2,4 @@
 .DS_*
 .Rdata
 .R*
+node_modules/
