@@ -79,7 +79,7 @@ function retrieveDataAverages(college, startDate, endDate, callback) {
  * @param {String} college
  * @param {DateTime} bedDateTime
  * @param {DateTime} wakeDateTime
- * @param {Funciton} callback
+ * @param {Function} callback
  */
 function insertData(college, bedDateTime, wakeDateTime, callback) {
 	var query = util.format("INSERT INTO sleepdata (`college`, `bed_datetime`, `wake_datetime`) VALUES ('%s','%s','%s','%s')", college, bedDateTime, wakeDateTime);
